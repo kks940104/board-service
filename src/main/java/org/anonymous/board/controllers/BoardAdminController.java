@@ -42,7 +42,7 @@ public class BoardAdminController {
      * @return
      */
     @GetMapping("/config")
-    public JSONData list() {
+    public JSONData list(@ModelAttribute BoardConfigSearch search) {
 
         return null;
     }
@@ -52,7 +52,7 @@ public class BoardAdminController {
      * @return
      */
     @PatchMapping("/config")
-    public JSONData update() {
+    public JSONData update(@RequestBody List<RequestConfig> form) {
 
         return null;
     }
