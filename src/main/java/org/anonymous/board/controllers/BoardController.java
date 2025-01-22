@@ -3,6 +3,7 @@ package org.anonymous.board.controllers;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.DELETE;
 import lombok.RequiredArgsConstructor;
+import org.anonymous.board.validators.BoardValidator;
 import org.anonymous.global.exceptions.BadRequestException;
 import org.anonymous.global.libs.Utils;
 import org.anonymous.global.rests.JSONData;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class BoardController {
 
     private final Utils utils;
+    private final BoardValidator boardValidator;
 
     /**
      * 게시판 설정 한개 조회
@@ -36,10 +38,13 @@ public class BoardController {
         String mode = form.getMode();
         mode = StringUtils.hasText(mode) ? mode : "write";
         commonProcess(form.getBid(), mode);
+
+        boardValidator.validate(form, errors);
+
         if (errors.hasErrors()) {
             throw new BadRequestException(utils.getErrorMessages(errors));
         }
-
+        // 서비스 넣으면 됨.
         return null;
     }
 
@@ -51,6 +56,7 @@ public class BoardController {
      */
     @GetMapping("/view/{seq}")
     public JSONData view(@PathVariable("seq") Long seq) {
+        commonProcess(seq, "view");
 
         return null;
     }
@@ -62,6 +68,7 @@ public class BoardController {
      */
     @GetMapping("/list/{bid}")
     public JSONData list(@PathVariable("bid") String bid) {
+        commonProcess(bid, "list");
 
         return null;
     }
@@ -73,7 +80,7 @@ public class BoardController {
      */
     @DeleteMapping("/{seq}")
     public JSONData delete(@PathVariable("seq") Long seq) {
-
+        commonProcess(seq, "delete");
         return null;
     }
 

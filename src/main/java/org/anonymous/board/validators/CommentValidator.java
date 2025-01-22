@@ -1,9 +1,10 @@
 package org.anonymous.board.validators;
 
 import lombok.RequiredArgsConstructor;
-import org.anonymous.board.controllers.RequestBoard;
+import org.anonymous.board.controllers.RequestComment;
 import org.anonymous.global.validators.PasswordValidator;
 import org.anonymous.member.MemberUtil;
+import org.aspectj.weaver.MemberUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -15,37 +16,43 @@ import org.springframework.validation.Validator;
 @Lazy
 @Component
 @RequiredArgsConstructor
-public class BoardValidator implements Validator, PasswordValidator {
+public class CommentValidator implements Validator, PasswordValidator {
 
     private final MemberUtil memberUtil;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return clazz.isAssignableFrom(RequestBoard.class);
+        return clazz.isAssignableFrom(RequestComment.class);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        RequestBoard form = (RequestBoard) target;
+        if (errors.hasErrors()) {
+            return;
+        }
 
-        // 비회원 비밀번호 검증
+        /**
+         * 1. 수정모드인 경우 seq 필수
+         * 2. 비회원인 경우 guestPw 필수, 비밀번호 복잡성 - 대소문자 구분없는 알파벳 + 숫자
+         */
+        RequestComment form = (RequestComment) target;
+        String mode = form.getMode();
+        Long seq = form.getSeq();
+        String guestPw = form.getGuestPw();
+
+        // 1. 수정모드인 경우 seq 필수
+        if (mode != null && mode.equals("edit") && (seq == null || seq < 1L)) {
+            errors.rejectValue("seq", "NotNull");
+        }
+
+        // 2. 비회원인 경우
         if (!memberUtil.isLogin()) {
             // 필수 항목 검증
             ValidationUtils.rejectIfEmptyOrWhitespace(errors, "guestPw", "NotBlank");
 
-            // 대소문자 구분없는 알파벳 1자 이상, 숫자 1자 이상 포함
-
-            String guestPw = form.getGuestPw();
             if (StringUtils.hasText(guestPw) && (!alphaCheck(guestPw, true) || !numberCheck(guestPw))) {
                 errors.rejectValue("guestPw", "Complexity");
-            }
-
-            // 수정일 때 게시글 번호(seq) 필수 항목
-            String mode = form.getMode();
-            Long seq = form.getSeq();
-            if (mode != null && mode.equals("edit") && (seq == null || seq <1L)) {
-                errors.rejectValue("seq", "NotNull");
             }
         }
     }
@@ -63,19 +70,7 @@ public class BoardValidator implements Validator, PasswordValidator {
 
         return false;
     }
-
-    /**
-     * 게시글 삭제 가능 여부 체크
-     *  - 댓글이 존재하면 삭제 불가
-     * @param seq
-     */
-    public void checkDelete(Long seq) {
-
-    }
-
 }
-
-
 
 
 
