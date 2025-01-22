@@ -1,7 +1,12 @@
 package org.anonymous.board.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.anonymous.board.validators.BoardConfigValidator;
+import org.anonymous.global.exceptions.BadRequestException;
+import org.anonymous.global.libs.Utils;
 import org.anonymous.global.rests.JSONData;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,13 +16,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BoardAdminController {
 
+    private final Utils utils;
+    private final BoardConfigValidator configValidator;
+
+
     /**
      * 게시판 설정 등록, 수정 처리
      *
      * @return
      */
     @PostMapping("/config")
-    public JSONData save() {
+    public JSONData save(@Valid @RequestBody RequestConfig form, Errors errors) {
+
+        configValidator.validate(form, errors);
+
+        if (errors.hasErrors()) {
+            throw new BadRequestException(utils.getErrorMessages(errors));
+        }
 
         return null;
     }
