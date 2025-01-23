@@ -1,14 +1,17 @@
 package org.anonymous.board.services;
 
 import lombok.RequiredArgsConstructor;
-import org.koreait.board.entities.BoardData;
-import org.koreait.board.entities.BoardView;
-import org.koreait.board.entities.QBoardView;
-import org.koreait.board.repositories.BoardDataRepository;
-import org.koreait.board.repositories.BoardViewRepository;
-import org.koreait.global.libs.Utils;
+import org.anonymous.board.entities.BoardData;
+import org.anonymous.board.entities.BoardView;
+import org.anonymous.board.entities.QBoardView;
+import org.anonymous.board.repositories.BoardDataRepository;
+import org.anonymous.board.repositories.BoardViewRepository;
+import org.anonymous.global.libs.Utils;
+import org.anonymous.member.MemberUtil;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Lazy
 @Service
@@ -21,6 +24,8 @@ public class BoardViewUpdateService {
     public long process(Long seq) {
         BoardData item = boardDataRepository.findById(seq).orElse(null);
         if (item == null) return 0L;
+
+
 
         try {
             BoardView view = new BoardView();

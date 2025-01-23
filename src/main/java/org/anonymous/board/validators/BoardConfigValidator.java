@@ -2,6 +2,7 @@ package org.anonymous.board.validators;
 
 import lombok.RequiredArgsConstructor;
 import org.anonymous.board.controllers.RequestConfig;
+import org.anonymous.board.repositories.BoardRepository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -12,6 +13,9 @@ import org.springframework.validation.Validator;
 @Component
 @RequiredArgsConstructor
 public class BoardConfigValidator implements Validator {
+
+    private final BoardRepository boardRepository;
+
     @Override
     public boolean supports(Class<?> clazz) {
         return clazz.isAssignableFrom(RequestConfig.class);
@@ -28,9 +32,8 @@ public class BoardConfigValidator implements Validator {
         mode = StringUtils.hasText(mode) ? mode : "add";
         String bid = form.getBid();
 
-        if (mode.equals("add")) {
-            // 게시판 아이디의 중복 여부 체크
-            
+        if (mode.equals("add") && boardRepository.exists(bid)) {
+            errors.rejectValue("bid", "Duplicated");
         }
 
     }

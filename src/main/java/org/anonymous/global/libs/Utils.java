@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.anonymous.global.entities.CodeValue;
 import org.anonymous.global.repositories.CodeValueRepository;
+import org.anonymous.member.MemberUtil;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.MessageSource;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class Utils {
 
+    private final MemberUtil memberUtil;
     private final HttpServletRequest request;
     private final MessageSource messageSource;
     private final DiscoveryClient discoveryClient;
@@ -208,6 +210,21 @@ public class Utils {
         }
 
         return headers;
+    }
+
+    /**
+     * 회원, 비회원 구분 해시
+     * 회원 - 회원번호, 비회원 - IP + User-Agent
+     * @return
+     */
+    public int getMemberHash() {
+        if (memberUtil.isLogin()) return Objects.hash(memberUtil.getMember().getSeq()); // 회원
+        else { // 비회원
+            String ip = request.getRemoteAddr();
+            String ua = request.getHeader("User-Agent");
+
+            return Objects.hash(ip, ua);
+        }
     }
 }
 
