@@ -2,6 +2,9 @@ package org.anonymous.board.validators;
 
 import lombok.RequiredArgsConstructor;
 import org.anonymous.board.controllers.RequestComment;
+import org.anonymous.board.entities.BoardData;
+import org.anonymous.board.entities.CommentData;
+import org.anonymous.board.repositories.CommentDataRepository;
 import org.anonymous.global.validators.PasswordValidator;
 import org.anonymous.member.MemberUtil;
 import org.aspectj.weaver.MemberUtils;
@@ -20,6 +23,7 @@ public class CommentValidator implements Validator, PasswordValidator {
 
     private final MemberUtil memberUtil;
     private final PasswordEncoder passwordEncoder;
+    private final CommentDataRepository commentDataRepository;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -66,7 +70,11 @@ public class CommentValidator implements Validator, PasswordValidator {
     public boolean checkGuestPassword(String password, Long seq) {
         if (seq == null) return false;
 
+        CommentData item = commentDataRepository.findById(seq).orElse(null);
 
+        if (item != null && StringUtils.hasText(item.getGuestPw())) {
+            return passwordEncoder.matches(password, item.getGuestPw());
+        }
 
         return false;
     }
