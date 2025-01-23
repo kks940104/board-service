@@ -10,6 +10,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
@@ -182,6 +183,31 @@ public class Utils {
         }
 
         return "";
+    }
+
+    public boolean isMobile() {
+
+        // 요청 헤더 - User-Agent / 브라우저 정보
+        String ua = request.getHeader("User-Agent");
+        String pattern = ".*(iPhone|iPod|iPad|BlackBerry|Android|Windows CE|LG|MOT|SAMSUNG|SonyEricsson).*";
+
+
+        return StringUtils.hasText(ua) && ua.matches(pattern);
+    }
+
+    /**
+     * 요청 헤더
+     *  - JWT 토큰이 있으면 자동 추가
+     * @return
+     */
+    public HttpHeaders getRequestHeader() {
+        String token = getAuthToken();
+        HttpHeaders headers = new HttpHeaders();
+        if (StringUtils.hasText(token)) {
+            headers.setBearerAuth(token);
+        }
+
+        return headers;
     }
 }
 

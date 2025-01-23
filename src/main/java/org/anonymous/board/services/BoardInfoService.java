@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.anonymous.board.controllers.BoardSearch;
 import org.anonymous.board.controllers.RequestBoard;
 import org.anonymous.board.entities.Board;
 import org.anonymous.board.entities.BoardData;
@@ -121,8 +122,7 @@ public class BoardInfoService {
 
             StringExpression subject = boardData.subject;
             StringExpression content = boardData.content;
-            StringExpression poster = boardData.poster.concat(boardData.member.name)
-                    .concat(boardData.member.email);
+            StringExpression poster = boardData.poster.concat(boardData.createdBy);
             StringExpression condition = null;
             if (sopt.equals("SUBJECT")) { // 제목 검색
                 condition = subject;
@@ -142,9 +142,7 @@ public class BoardInfoService {
 
         JPAQuery<BoardData> query =
                 queryFactory.selectFrom(boardData)
-                        .leftJoin(boardData.board) // 지연로딩
-                        .fetchJoin() // 이므로 빨리 가져오려고
-                        .leftJoin(boardData.member)
+                        .leftJoin(boardData.board)
                         .fetchJoin()
                         .where(andBuilder)
                         .offset(offset)
@@ -156,7 +154,7 @@ public class BoardInfoService {
         // 회원 이메일
         List<String> emails = search.getEmail();
         if (emails != null && emails.isEmpty()) {
-            andBuilder.and(boardData.member.email.in(emails));
+            andBuilder.and(boardData.createdBy.in(emails));
         }
 
         // region 정렬 조건 처리
@@ -258,19 +256,6 @@ public class BoardInfoService {
      */
     private void addInfo(BoardData item, boolean isView) {
 
-        // region 게시판 파일 정보
-
-        String gid = item.getGid();
-        List<FileInfo> editorImages = fileInfoService.getList(gid, "editor");
-        item.setEditorImages(editorImages);
-        item.setAttachFiles(fileInfoService.getList(gid, "attach"));
-
-        if (editorImages != null && !editorImages.isEmpty()) {
-            FileInfo selectedImage = editorImages.stream().filter(FileInfo::isSelected).findFirst().orElseGet(() -> editorImages.get(0));
-            item.setSelectedImage(selectedImage);
-        }
-        // endregion
-
         // region 이전, 다음 게시글
 
         if (isView) { // 보기 페이지 데이터를 조회하는 경우만 이전, 다음글을 조회
@@ -298,12 +283,12 @@ public class BoardInfoService {
         boolean listable = board.isListable();
         boolean writable = board.isWritable();
 
-        Member member = item.getMember();
+        String createdBy = item.getCreatedBy();
         Member loggedMember = memberUtil.getMember();
 
-        boolean editable = member == null || (memberUtil.isLogin() && loggedMember.getEmail().equals(member.getEmail())); // 비회원은 비밀번호 확인이 필요하므로 버튼 노출, 회원 게시글은 로그인한 회원과 일치하면 노출.
+        boolean editable = createdBy == null || (memberUtil.isLogin() && loggedMember.getEmail().equals(createdBy)); // 비회원은 비밀번호 확인이 필요하므로 버튼 노출, 회원 게시글은 로그인한 회원과 일치하면 노출.
 
-        boolean mine = request.getSession().getAttribute("board_" + item.getSeq()) != null || (member != null && memberUtil.isLogin() && loggedMember.getEmail().equals(member.getEmail()));
+        boolean mine = utils.getValue(utils.getUserHash() + "_board_" + item.getSeq()) != null || (memberUtil.isLogin() && loggedMember.getEmail().equals(createdBy));
 
         item.setListable(listable);
         item.setWritable(writable);

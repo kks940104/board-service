@@ -8,14 +8,19 @@ import org.anonymous.board.entities.BoardData;
 import org.anonymous.board.exceptions.BoardDataNotFoundException;
 import org.anonymous.board.repositories.BoardDataRepository;
 import org.anonymous.board.services.configs.BoardConfigInfoService;
-import org.anonymous.file.services.FileDoneService;
-import org.anonymous.member.libs.MemberUtil;
+import org.anonymous.global.libs.Utils;
+import org.anonymous.member.MemberUtil;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
 import java.util.Objects;
 
 @Lazy
@@ -27,9 +32,10 @@ public class BoardUpdateService {
     private final BoardConfigInfoService configInfoService; // 게시판 설정 가져오기
     private final BoardDataRepository boardDataRepository;
     private final PasswordEncoder passwordEncoder;
-    private final FileDoneService fileDoneService;
     private final HttpServletRequest request;
+    private final RestTemplate restTemplate;
     private final MemberUtil memberUtil;
+    private final Utils utils;
 
     public BoardData process(RequestBoard form) {
 
@@ -49,7 +55,6 @@ public class BoardUpdateService {
             Board board = configInfoService.get(form.getBid());
             data = new BoardData();
             data.setBoard(board);
-            data.setMember(memberUtil.getMember());
             data.setGid(form.getGid());
             data.setIpAddr(request.getRemoteAddr()); // IP 주소...
             data.setUserAgent(request.getHeader("User-Agent"));
@@ -75,10 +80,16 @@ public class BoardUpdateService {
 
         boardDataRepository.saveAndFlush(data);
 
-        fileDoneService.process(form.getGid());
+        // region 게시글 파일 첨부 작업 완료 처리
+
+        String apiUrl = utils.serviceUrl("file-service", "/done/" + data.getGid());
+        HttpEntity<Void> request = new HttpEntity<>(utils.getRequestHeader());
+        restTemplate.exchange(URI.create(apiUrl), HttpMethod.GET, request, Void.class);
+
+        // endregion
 
         // 비회원 게시글 인증 정보 삭제
-        request.getSession().removeAttribute("board_" + seq);
+        utils.deleteValue(utils.getUserHash() + "_board_" + seq);
 
         return data;
     }
