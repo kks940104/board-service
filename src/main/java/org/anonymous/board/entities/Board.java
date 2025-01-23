@@ -1,0 +1,66 @@
+package org.anonymous.board.entities;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import org.anonymous.global.entities.BaseMemberEntity;
+import org.anonymous.member.contants.Authority;
+
+import java.io.Serializable;
+import java.util.List;
+
+@Data
+@Entity
+public class Board extends BaseMemberEntity implements Serializable {
+
+    @Id
+    @Column(length = 30)
+    private String bid;
+
+    @Column(length = 90, nullable = false)
+    private String name; // 게시판 명
+
+    @Column(name = "_open")
+    private boolean open;
+
+    @Lob
+    private String category;
+
+    private int rowsPerPage;
+    private int pageRanges;
+    private int pageRangesMobile;
+
+    private boolean useEditor;
+    private boolean useEditorImage;
+    private boolean useAttachFile;
+    private boolean useComment; // 댓글 사용 여부
+    private boolean listUnderView; // 글 보기 하단에 글 목록 노출 여부
+    private String locationAfterWriting; // 글 작성후 이동 경로 - list : 목록, view : 글보기
+
+    private String skin;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private Authority listAuthority;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private Authority viewAuthority;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private Authority writeAuthority;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private Authority commentAuthority;
+
+    @Transient
+    private List<String> categories;
+
+    @Transient
+    private boolean listable;
+
+    @Transient
+    private boolean writable;
+
+}
