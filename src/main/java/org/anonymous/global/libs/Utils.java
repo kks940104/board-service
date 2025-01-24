@@ -3,6 +3,7 @@ package org.anonymous.global.libs;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.anonymous.global.entities.CodeValue;
 import org.anonymous.global.repositories.CodeValueRepository;
 import org.anonymous.member.MemberUtil;
@@ -20,6 +21,7 @@ import org.springframework.validation.FieldError;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Lazy
 @Component
 @RequiredArgsConstructor

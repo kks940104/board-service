@@ -84,6 +84,7 @@ public class BoardUpdateService {
 
         String apiUrl = utils.serviceUrl("file-service", "/done/" + data.getGid());
         HttpEntity<Void> request = new HttpEntity<>(utils.getRequestHeader());
+        System.out.println("apiUrl:" + apiUrl);
         restTemplate.exchange(URI.create(apiUrl), HttpMethod.GET, request, Void.class);
 
         // endregion

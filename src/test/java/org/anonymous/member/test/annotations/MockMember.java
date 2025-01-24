@@ -8,7 +8,7 @@ import org.anonymous.member.contants.Authority;
 import org.springframework.security.test.context.support.WithSecurityContext;
 
 @Target(ElementType.METHOD)
-@Retention(RetentionPolicy.CLASS)
+@Retention(RetentionPolicy.RUNTIME)
 @WithSecurityContext(factory = MockSecurityContextFactory.class)
 public @interface MockMember {
     long seq() default 1L;

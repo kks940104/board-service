@@ -31,7 +31,7 @@ public class BoardDeleteService {
         // region 파일 삭제
 
         HttpEntity<Void> request = new HttpEntity<>(utils.getRequestHeader());
-        String apiUrl = utils.serviceUrl("file-service", "/delete/" + item.getGid());
+        String apiUrl = utils.serviceUrl("file-service", "/deletes/" + item.getGid());
         restTemplate.exchange(URI.create(apiUrl), HttpMethod.DELETE, request, Void.class);
 
         // endregion

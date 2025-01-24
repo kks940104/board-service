@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 
 @SpringBootTest
-@ActiveProfiles({"default", "test"})
+@ActiveProfiles({"default", "dev", "test"})
 @AutoConfigureMockMvc
 public class BoardControllerTest {
     @Autowired
