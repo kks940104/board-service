@@ -19,7 +19,6 @@ import org.anonymous.global.paging.ListData;
 import org.anonymous.global.paging.Pagination;
 import org.anonymous.member.Member;
 import org.anonymous.member.MemberUtil;
-import org.apache.tomcat.jni.FileInfo;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -48,7 +47,7 @@ public class BoardInfoService {
      */
     public BoardData get(Long seq) {
 
-        BoardData item = boardDataRepository.findById(seq).orElseThrow(BoardDataNotFoundException::new);
+        BoardData item = boardDataRepository.findBySeq(seq).orElseThrow(BoardDataNotFoundException::new);
 
         addInfo(item, true); // 추가 정보 처리
 

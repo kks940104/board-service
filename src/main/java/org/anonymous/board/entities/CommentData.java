@@ -1,5 +1,6 @@
 package org.anonymous.board.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import jakarta.persistence.*;
 import org.anonymous.global.entities.BaseMemberEntity;
@@ -14,6 +15,7 @@ public class CommentData extends BaseMemberEntity implements Serializable {
     @Id @GeneratedValue
     private Long seq;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private BoardData data;
 

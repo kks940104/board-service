@@ -14,6 +14,7 @@ public class MockSecurityContextFactory implements WithSecurityContextFactory<Mo
     @Override
     public SecurityContext createSecurityContext(MockMember annotation) {
         Member member = new Member();
+        member.setEmail(annotation.email());
         member.setSeq(annotation.seq());
         member.setName(annotation.name());
         member.set_authorities(Arrays.stream(annotation.authority()).toList());

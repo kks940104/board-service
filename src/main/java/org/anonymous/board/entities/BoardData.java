@@ -2,7 +2,6 @@ package org.anonymous.board.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.anonymous.global.entities.BaseEntity;
 import org.anonymous.global.entities.BaseMemberEntity;
 
 import java.io.Serializable;
