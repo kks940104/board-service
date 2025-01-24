@@ -8,7 +8,6 @@ import org.springframework.data.redis.core.RedisHash;
 import java.io.Serializable;
 
 @Data
-@Entity
 @RedisHash(timeToLive = 300) // 5분간 값 유지
 public class CodeValue implements Serializable {
     @Id
