@@ -2,9 +2,15 @@ package org.anonymous.board.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.anonymous.board.entities.Board;
+import org.anonymous.board.services.BoardDeleteService;
+import org.anonymous.board.services.configs.BoardConfigDeleteService;
+import org.anonymous.board.services.configs.BoardConfigInfoService;
+import org.anonymous.board.services.configs.BoardConfigUpdateService;
 import org.anonymous.board.validators.BoardConfigValidator;
 import org.anonymous.global.exceptions.BadRequestException;
 import org.anonymous.global.libs.Utils;
+import org.anonymous.global.paging.ListData;
 import org.anonymous.global.rests.JSONData;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +23,10 @@ import java.util.List;
 public class BoardAdminController {
 
     private final Utils utils;
+    private final BoardConfigInfoService infoService;
     private final BoardConfigValidator configValidator;
+    private final BoardConfigUpdateService updateService;
+    private final BoardConfigDeleteService deleteService;
 
 
     /**
@@ -34,7 +43,9 @@ public class BoardAdminController {
             throw new BadRequestException(utils.getErrorMessages(errors));
         }
 
-        return null;
+        Board board = updateService.process(form);
+
+        return new JSONData(board);
     }
 
     /**
@@ -43,8 +54,8 @@ public class BoardAdminController {
      */
     @GetMapping("/config")
     public JSONData list(@ModelAttribute BoardConfigSearch search) {
-
-        return null;
+        ListData<Board> items = infoService.getList(search);
+        return new JSONData(items);
     }
 
     /**
@@ -64,8 +75,8 @@ public class BoardAdminController {
      */
     @DeleteMapping("/config")
     public JSONData delete(@RequestParam("bid") List<String> bids) {
-
-        return null;
+        List<Board> items = deleteService.process(bids);
+        return new JSONData(items);
     }
 }
 

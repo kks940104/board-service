@@ -25,9 +25,8 @@ public class BoardDeleteService {
     private final BoardInfoService infoService;
     private final BoardDataRepository boardRepository;
 
-    public void delete(Long seq) {
+    public BoardData delete(Long seq) {
         BoardData item = infoService.get(seq);
-        String gid = item.getGid();
 
         // region 파일 삭제
 
@@ -43,5 +42,7 @@ public class BoardDeleteService {
         // 비회원 인증 정보 삭제
         utils.deleteValue(utils.getUserHash() + "_board_" + seq);
 
+
+        return item;
     }
 }

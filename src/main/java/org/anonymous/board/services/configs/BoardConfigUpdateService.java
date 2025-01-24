@@ -21,7 +21,7 @@ import java.util.Objects;
 public class BoardConfigUpdateService {
     private final BoardRepository boardRepository;
     private final Utils utils;
-    public void process(RequestConfig form) {
+    public Board process(RequestConfig form) {
         String bid = form.getBid();
         Board board = boardRepository.findById(bid).orElseGet(Board::new);
 
@@ -48,6 +48,8 @@ public class BoardConfigUpdateService {
         board.setListUnderView(form.isListUnderView());
 
         boardRepository.saveAndFlush(board);
+
+        return board;
     }
 }
 
