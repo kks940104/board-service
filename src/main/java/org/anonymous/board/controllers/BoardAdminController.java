@@ -64,8 +64,8 @@ public class BoardAdminController {
      */
     @PatchMapping("/config")
     public JSONData update(@RequestBody List<RequestConfig> form) {
-
-        return null;
+        List<Board> items = updateService.process(form);
+        return new JSONData(items);
     }
 
     /**
